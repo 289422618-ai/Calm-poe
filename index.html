@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我的桌面小精灵</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #fff4e8, #f4eaff);
+      color: #55434d;
+      font-family: "Microsoft YaHei", sans-serif;
+    }
+
+    .card {
+      width: min(100%, 390px);
+      padding: 30px 24px;
+      border-radius: 28px;
+      background: #ffffffd9;
+      box-shadow: 0 16px 40px #8e668322;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 13px;
+      border-radius: 20px;
+      background: #fff0f4;
+      color: #bd718b;
+      font-size: 14px;
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: 26px;
+    }
+
+    .hint {
+      margin: 0;
+      color: #897782;
+      font-size: 14px;
+    }
+
+    .pet {
+      position: relative;
+      display: block;
+      width: 190px;
+      height: 190px;
+      margin: 12px auto 4px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .pet:hover {
+      transform: translateY(-5px) rotate(-3deg);
+    }
+
+    .pet:focus-visible,
+    .love-button:focus-visible {
+      outline: 3px solid #bd83d2;
+      outline-offset: 5px;
+    }
+
+    .ear {
+      position: absolute;
+      top: 18px;
+      z-index: 0;
+      width: 52px;
+      height: 62px;
+      background: #e9ac97;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+
+    .ear-left {
+      left: 29px;
+      transform: rotate(-13deg);
+    }
+
+    .ear-right {
+      right: 29px;
+      transform: rotate(13deg);
+    }
+
+    .face {
+      position: absolute;
+      top: 47px;
+      left: 15px;
+      z-index: 1;
+      width: 160px;
+      height: 132px;
+      border-radius: 48%;
+      background: #ffdbbd;
+      box-shadow: inset 0 -7px 0 #f5c7aa;
+    }
+
+    .eye {
+      position: absolute;
+      top: 53px;
+      width: 11px;
+      height: 15px;
+      border-radius: 50%;
+      background: #59424a;
+    }
+
+    .eye-left {
+      left: 43px;
+    }
+
+    .eye-right {
+      right: 43px;
+    }
+
+    .blush {
+      position: absolute;
+      top: 77px;
+      width: 20px;
+      height: 11px;
+      border-radius: 50%;
+      background: #f5a9ad;
+      opacity: 0.8;
+    }
+
+    .blush-left {
+      left: 23px;
+    }
+
+    .blush-right {
+      right: 23px;
+    }
+
+    .nose {
+      position: absolute;
+      top: 73px;
+      left: 75px;
+      width: 10px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d98699;
+    }
+
+    .mouth {
+      position: absolute;
+      top: 79px;
+      left: 72px;
+      width: 16px;
+      height: 10px;
+      border-bottom: 2px solid #59424a;
+      border-radius: 50%;
+    }
+
+    .pet.happy .face {
+      animation: bounce 0.35s ease;
+    }
+
+    @keyframes bounce {
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .message {
+      min-height: 48px;
+      margin: 4px 0 16px;
+      padding: 13px;
+      border-radius: 16px;
+      background: #f8f1ff;
+    }
+
+    .love-button {
+      padding: 11px 18px;
+      border: 0;
+      border-radius: 20px;
+      background: #ed9fba;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .love-button:hover {
+      background: #df86a6;
+    }
+
+    #affection {
+      margin-bottom: 0;
+      color: #9b7188;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <div class="badge">♡ 今日份小可爱</div>
+    <h1>我的桌面小精灵</h1>
+    <p class="hint">点点小猫，看看它会说什么！</p>
+
+    <button class="pet" id="pet" type="button" aria-label="点击小猫互动">
+      <span class="ear ear-left"></span>
+      <span class="ear ear-right"></span>
+      <span class="face">
+        <span class="eye eye-left"></span>
+        <span class="eye eye-right"></span>
+        <span class="blush blush-left"></span>
+        <span class="blush blush-right"></span>
+        <span class="nose"></span>
+        <span class="mouth"></span>
+      </span>
+    </button>
+
+    <p class="message" id="message" aria-live="polite">喵～你好呀！</p>
+
+    <button class="love-button" id="love-button" type="button">
+      送它一颗爱心 💗
+    </button>
+    <p id="affection">好感度：0 💖</p>
+  </main>
+
+  <script>
+    const pet = document.querySelector("#pet");
+    const message = document.querySelector("#message");
+    const loveButton = document.querySelector("#love-button");
+    const affection = document.querySelector("#affection");
+
+    const greetings = [
+      "今天也要开心哦！",
+      "嘿嘿，我喜欢你！",
+      "喵～再陪我玩一会儿吧！"
+    ];
+
+    let greetingIndex = 0;
+    let lovePoints = 0;
+
+    pet.addEventListener("click", () => {
+      greetingIndex = (greetingIndex + 1) % greetings.length;
+      message.textContent = greetings[greetingIndex];
+      pet.classList.toggle("happy");
+    });
+
+    loveButton.addEventListener("click", () => {
+      lovePoints += 1;
+      affection.textContent = `好感度：${lovePoints} 💖`;
+      message.textContent = "谢谢你的爱心！喵～";
+      pet.classList.add("happy");
+    });
+  </script>
+</body>
+</html>
